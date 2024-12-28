@@ -89,27 +89,30 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text('Todo list')),
-      body: ListView.builder(
-        itemCount: _tasks.length,
-        itemBuilder: (context, index) {
-          final item = _tasks[index];
-          return ListTile(
-            title: Text(item['task']),
-            trailing: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                IconButton(
-                  icon: Icon(Icons.edit),
-                  onPressed: () => _showForm(task: item['task']),
-                ),
-                IconButton(
-                  icon: Icon(Icons.delete),
-                  onPressed: () => _deleteItem(item['task']),
-                ),
-              ],
-            ),
-          );
-        },
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: ListView.separated(
+          itemCount: _tasks.length,
+          itemBuilder: (context, index) {
+            final item = _tasks[index];
+            return ListTile(
+              title: Text(item['task']),
+              trailing: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  IconButton(
+                    icon: Icon(Icons.edit),
+                    onPressed: () => _showForm(task: item['task']),
+                  ),
+                  IconButton(
+                    icon: Icon(Icons.delete),
+                    onPressed: () => _deleteItem(item['task']),
+                  ),
+                ],
+              ),
+            );
+          }, separatorBuilder: (BuildContext context, int index) {  return Divider(); },
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showForm(),
