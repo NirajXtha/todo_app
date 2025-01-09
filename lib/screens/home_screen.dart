@@ -89,7 +89,15 @@ class _HomeScreenState extends State<HomeScreen> {
               controller: _taskController,
               decoration: InputDecoration(labelText: 'Task'),
             ),
+            SizedBox(height: 16.0),
             ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.blue,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20.0),
+                ),
+              ),
               onPressed: () {
                 if (task == null) {
                   _addItem();
