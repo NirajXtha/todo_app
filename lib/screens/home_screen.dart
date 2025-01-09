@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -11,17 +12,35 @@ class _HomeScreenState extends State<HomeScreen> {
 
   TextEditingController _taskController = TextEditingController();
 
-  List<Map<String, dynamic>> _tasks = [];
+  List<String> _tasks = [];
+
+  late SharedPreferences prefs;
 
   @override
   void initState() {
     super.initState();
+    _loadPrefs();
     _refreshTasks();
+  }
+
+  void _loadPrefs() async {
+    prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _tasks = prefs.getStringList('tasks') ?? [];
+    });
+  }
+
+  void _updatePrefs() async {
+    await prefs.remove('tasks');
+    setState(() {
+      prefs.setStringList('tasks', _tasks);
+    });
   }
 
   void _refreshTasks() async {
     setState(() {
       _tasks;
+      _updatePrefs();
       print(_tasks);
     });
   }
@@ -29,7 +48,7 @@ class _HomeScreenState extends State<HomeScreen> {
    void _addItem() async {
     if (_taskController.text.isNotEmpty) {
       String data = _taskController.text;
-      _tasks.add({'task': data});
+      _tasks.add(data);
       _taskController.clear();
       _refreshTasks();
     }
@@ -38,21 +57,23 @@ class _HomeScreenState extends State<HomeScreen> {
   void _updateItem(String task) async {
     if (_taskController.text.isNotEmpty) {
       String data = _taskController.text;
-      _tasks[_tasks.indexWhere((item) => item['task'] == task)] = {'task': data};
+      _tasks[_tasks.indexOf(task)] = data;
+      print("Index Of: ${_tasks.indexOf(task)}");
       _taskController.clear();
       _refreshTasks();
     }
   }
 
   void _deleteItem(String task) async {
-    _tasks.removeWhere((item) => item['task'] == task);
+    _tasks.remove(task);
+    print("After Deleted: $_tasks");
     _refreshTasks();
   }
 
   void _showForm({String? task}) {
     if (task != null) {
-      final existingItem = _tasks.firstWhere((item) => item['task'] == task);
-      _taskController.text = existingItem['task'];
+      final existingItem = _tasks[_tasks.indexOf(task)];
+      _taskController.text = existingItem;
     } else {
       _taskController.clear();
     }
@@ -96,17 +117,17 @@ class _HomeScreenState extends State<HomeScreen> {
           itemBuilder: (context, index) {
             final item = _tasks[index];
             return ListTile(
-              title: Text(item['task']),
+              title: Text(item),
               trailing: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   IconButton(
                     icon: Icon(Icons.edit),
-                    onPressed: () => _showForm(task: item['task']),
+                    onPressed: () => _showForm(task: item),
                   ),
                   IconButton(
                     icon: Icon(Icons.delete),
-                    onPressed: () => _deleteItem(item['task']),
+                    onPressed: () => _deleteItem(item),
                   ),
                 ],
               ),
